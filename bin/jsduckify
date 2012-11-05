@@ -1,3 +1,3 @@
 #!/usr/bin/env coffee
 
-require(__dirname + '/../jsduckify')
+require(__dirname + '/../src/jsduckify')

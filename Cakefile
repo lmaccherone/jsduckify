@@ -8,14 +8,13 @@ run = (command, options, next) ->
   if options? and options.length > 0
     command += ' ' + options.join(' ')
   exec(command, (error, stdout, stderr) ->
-    if stderr.length > 0
+    if stderr.length > 0 and error?
       console.log("Stderr exec'ing command '#{command}'...\n" + stderr)
-    if error?
       console.log('exec error: ' + error)
     if next?
       next(stdout)
     else
-      if stdout.length > 0
+      if stdout.length > 0 and stdout?
         console.log("Stdout exec'ing command '#{command}'...\n" + stdout)
   )
 

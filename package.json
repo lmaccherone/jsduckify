@@ -1,7 +1,6 @@
 {
   "name": "jsduckify",
   "version": "0.1.0",
-  "main": "./jsduckify",
   "description": "Enables the use of Sencha's JSDuck for documenting CoffeeScript projects.",
   "keywords": [
     "JSDuck",
