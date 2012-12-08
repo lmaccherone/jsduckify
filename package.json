@@ -1,7 +1,7 @@
 {
   "name": "jsduckify",
   "main": "./index",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Enables the use of Sencha's JSDuck for documenting CoffeeScript projects.",
   "keywords": [
     "JSDuck",
@@ -36,9 +36,7 @@
     "wrench": "~1.4.4"
   },
   "scripts": {
-    "test": "cake test",
-    "posttest": "cake doctest",
-    "postinstall": "cake compile"
+    "test": "cake test"
   },
   "licenses": [
     {
