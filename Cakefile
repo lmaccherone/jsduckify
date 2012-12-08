@@ -78,7 +78,6 @@ task('publish', 'Publish to npm', () ->
   process.chdir(__dirname)
   runSync('cake test')  # Doing this exernally to make it synchrous
   invoke('docs')
-  invoke('build')
   runSync('git status --porcelain', [], (stdout) ->
     if stdout.length == 0
       {stdout, stderr} = execSync('git rev-parse origin/master', true)
