@@ -1,6 +1,7 @@
 {
   "name": "jsduckify",
-  "version": "0.1.0",
+  "main": "./index",
+  "version": "0.2.0",
   "description": "Enables the use of Sencha's JSDuck for documenting CoffeeScript projects.",
   "keywords": [
     "JSDuck",
@@ -15,27 +16,34 @@
   "engines": {
     "node": "0.8.x"
   },
-  "dependencies": {
-    "coffee-script": "1.3.x"
-  },
   "repository": {
-    "type" : "git",
-    "url" : "http://github.com/lmaccherone/jsduckify.git"
+    "type": "git",
+    "url": "http://github.com/lmaccherone/jsduckify.git"
   },
-  "preferGlobal": true,
+  "preferGlobal": false,
   "bin": {
     "jsduckify": "./bin/jsduckify"
   },
+  "dependencies": {
+    "coffee-script": "1.4.x",
+    "doubly-linked-list": "0.1.x"
+  },
   "devDependencies": {
-    "nodeunit": "0.7.x"
+    "nodeunit": "0.7.x",
+    "coffeedoctest": "0.4.x",
+    "exec-sync": "~0.1.5",
+    "marked": "~0.2.6",
+    "wrench": "~1.4.4"
   },
   "scripts": {
-    "test": "cake testall"
+    "test": "cake test",
+    "posttest": "cake doctest",
+    "postinstall": "cake compile"
   },
   "licenses": [
-     {
-         "type": "MIT",
-         "url": "http://www.opensource.org/licenses/MIT"
-     }
-   ]
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/MIT"
+    }
+  ]
 }

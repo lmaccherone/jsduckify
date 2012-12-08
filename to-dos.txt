@@ -1,0 +1,42 @@
+Features
+  Major refactor to support the described behavior in README.md.
+
+  Modify Cakefile to be like Lumenize and include the README.md as welcome page
+
+  include properties if they have docstrings. Support these forms:
+      @ property name
+      @ property {Type} name
+      @ property {Type} [name="default value"]
+  but not this form because we want to specify the path to the property via the module's "exports" API
+      @ property {Type} name.subproperty
+
+  refactor Module -> SourceFile, Package -> Module
+
+  cleanup docs and get them to generate
+  add link to docs in README.md and push to gh-pages (upgrade Cakefile)
+  confirm that devDependencies get installed when you run `npm install`?
+  exclude private methods that start with _
+  build the entire structure from requireing the module. This would give it all the right hierarchy.
+    utils and functions ($min, $average, etc.) are submodules but jsduckify now shows them at the root. Either move to lumenize root, hide or somehow get jsduckify to specify them as submodules. Simply importing it as a module gives you the hierarchy tree.
+  understand a config object and add support for it
+  add support for mixins
+  build the entire structure from requireing the module. This would give it all the right hierarchy.
+  Upgrade Deps to support these forms and stuff this info into @uses or @requires
+    {ChartTime, ChartTimeIterator} = require('somefilename')
+    ChartTime = require('somefilename').ChartTime
+    x = require('somefile')  # might be harder
+    ChartTime = x.ChartTime
+  support the addition of source files as well as in the output tree for javascript code even in coffeescript projects as long as they are exposed in the exports API for the package
+
+Refactorings
+  remove unused code
+  refactor names to cleanup "output" "module" "file" etc
+  reformat my source so it's all 2 character indented
+  see if I can remove the file reference
+  coffeeLint
+  add parens for function calls in my coffeescript
+  update my Cakefile to be oriented toward npm. Support test, publish, and rebuild (maybe). Put rebuild build stuff in the pretest and prepublish steps. Make sure coffeedoctests run as part of the build. Means I'll have to update coffeedoctest probably to support running from node_modules.
+  more tests
+
+  Travis CI
+  usage in README.md

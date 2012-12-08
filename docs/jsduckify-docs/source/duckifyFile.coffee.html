@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/* &lt;CoffeeScript&gt;
+{DoublyLinkedList} = require('doubly-linked-list')
+
+_space = (level, multiplier = 1) -&gt;
+  return new Array(level * multiplier + 1).join(' ')
+
+_contains = (s, s2) -&gt;
+  return s.indexOf(s2) &gt;= 0
+
+_stripLeadingBlanks = (filename, line, count) -&gt;
+  startOfLine = line.slice(0, count)
+  minLength = Math.min(startOfLine.length, count)
+  unless startOfLine == _space(minLength)
+    console.error(&quot;Non whitespace found within the indent space for the docstring in file: #{filename}. At line:\n&quot; +
+      &quot;#{line}&quot;
+    )
+  return line.slice(count)
+
+_convertLinesFromCSToJS = (filename, start, end, indent) -&gt;
+  current = start
+  while current != end.after
+    current.value = _space(indent) + ' * ' + _stripLeadingBlanks(filename, current.value, indent)
+    current = current.after
+
+_convertDocstringFromCSToJS = (filename, docstringStart, docstringEnd) -&gt;
+  # Figure out the number of indention characters
+  indent = docstringStart.value.indexOf('###')
+  unless indent == docstringEnd.value.indexOf('###')
+    console.error(&quot;Starting and ending docstrings do not have the same indention in file #{filename}.\n&quot; +
+      &quot;start:\n#{docstringStart.value}\n&quot; + &quot;end:\n#{docstringEnd.value}&quot;
+    )
+  docstringStart.insertBefore('&lt;/CoffeeScript&gt; * /')  # ends the JS comment wrapping the entire file
+  docstringStart.value = _space(indent) + '/ **'
+  _convertLinesFromCSToJS(filename, docstringStart.after, docstringEnd, indent)
+  docstringEnd.value = _space(indent) + ' * /'
+  docstringEnd.insertAfter('/ * &lt;CoffeeScript&gt;')  # restarts the JS comment wrapping the entire file
+
+_processNameAndMember = (nameLine, memberLine, exportsAPI, prefix, fullNameForCurrentClass) -&gt;
+  # !TODO: (round 2) Marks it as processed in the fileDocumentation
+  a = nameLine.value.match(/@(class|method|property)\s([\$|\w]+)\b/)
+  type = a[1]
+  name = a[2]
+  fullName = null
+  for e in exportsAPI
+    if name in e.fullName.split('.')
+      e.processed = true
+      fullName = prefix + '.' + e.fullName
+      break
+  space = nameLine.value.indexOf('@')
+  unless fullName?
+    fullName = prefix + '.' + name
+    nameArray = fullName.split('.')
+    baseName = nameArray[nameArray.length - 1]
+    if baseName.indexOf('_') == 0
+      nameLine.insertAfter(_space(space) + '@private')  # !TODO: This will add it twice if it's already there but OK.
+
+  nameLine.value = _space(space)
+  switch type
+    when 'class'
+      nameLine.value += &quot;@class #{fullName}&quot;
+      fullNameForCurrentClass = fullName
+    when 'method', 'property'
+      nameLine.value += &quot;@#{type} #{name}&quot;
+      unless memberLine?  # !TODO: Maybe I should manipulate the existing memberLine
+        if fullNameForCurrentClass?
+          member = fullNameForCurrentClass
+        else
+          member = prefix
+        memberLine = nameLine.insertAfter(_space(space) + &quot;@member #{member}&quot;)
+
+  return fullNameForCurrentClass
+
+_processDocstring = (filename, docstringStart, docstringEnd, currentClass, exportsAPI, prefix) -&gt;
+  foundSomething = false
+
+  # Look for the @class, @method, @constructor, or @property JSDuck tags.
+  current = docstringStart.after
+  nameLine = null
+  type = null
+  memberLine = null
+  while current? and current != docstringEnd
+    s = current.value
+    if _contains(s, &quot;@class&quot;)
+      if type?
+        throw new Error(&quot;Found @class when docstring already has an @#{type} in: #{filename}.&quot;)
+      else
+        type = 'class'
+        nameLine = current
+    if _contains(s, &quot;@method&quot;)
+      if type?
+        throw new Error(&quot;Found @method when docstring already has an @#{type} in: #{filename}.&quot;)
+      else
+        type = 'method'
+        nameLine = current
+    if _contains(s, &quot;@property&quot;)
+      if type?
+        throw new Error(&quot;Found @property when docstring already has an @#{type} in: #{filename}.&quot;)
+      else
+        type = 'property'
+        nameLine = current
+    if _contains(s, &quot;@constructor&quot;)
+      if type?
+        unless type == 'class'
+          throw new Error(&quot;Cannot define an @constructor inside an @#{type} docstring in: #{filename}.&quot;)
+        # We can essentially do nothing because the @constructor is already part of the @class docstring
+      else
+        unless currentClass.end?
+          throw new Error(&quot;I have no idea where to associate this constructor.&quot;)
+        type = 'constructor'
+        nameLine = current
+    if _contains(s, &quot;@member&quot;)
+      memberLine = current
+    current = current.after
+
+  if type == 'class'
+    currentClass.start = docstringStart
+    currentClass.end = docstringEnd
+    fullNameForCurrentClass = _processNameAndMember(nameLine, memberLine, exportsAPI, prefix, currentClass.fullName)
+    currentClass.fullName = fullNameForCurrentClass
+  if type == 'constructor'
+    # * Append the current docstring to the end of the currentClass
+    constructorBodyStart = docstringStart.after
+    constructorBodyStart.before.remove()
+    docstringStart = constructorBodyStart
+    constructorBodyEnd = docstringEnd.before
+    constructorBodyEnd.after.remove()
+    docstringEnd = constructorBodyEnd
+
+    # Move the constructor to the bottom of the class
+    indent = currentClass.end.before.value.indexOf('*') - 1
+    if indent &lt; 0
+      throw new Error(&quot;Expected * to be at the top of the docstring in #{filename}&quot;)
+    indentConstructor = constructorBodyStart.value.indexOf('@')
+    if indentConstructor &lt; 0
+      throw new Error(&quot;Expected @constructor to be at the top of the docstring in #{filename}&quot;)
+    newLine = _space(indent) + ' * '
+    currentClass.end.insertBefore(newLine)  # Blank line between Class and Constructor
+    current = constructorBodyStart.before
+    while current != constructorBodyEnd and current?
+      current = current.after
+      newLine = _space(indent) + ' * ' + _stripLeadingBlanks(filename, current.value, indentConstructor)
+      currentClass.end.insertBefore(newLine)
+      current.before.remove()
+
+  if type in ['property', 'method']
+    _processNameAndMember(nameLine, memberLine, exportsAPI, prefix, currentClass.fullName)
+    # * (round 2) Mark it as @static if it is according to fileDocumentation.
+    # * (round 2) Uses fileDocumentation to specify the @membership.
+
+  # (round 2) For each element in fileDocumentation that is not marked as processed, it tries to locate it and create
+  # the appropriate JSDuck header. Note, in my old code, I was able to identify parameters.
+
+  foundSomething = type?
+  if foundSomething and type != 'constructor'
+    _convertDocstringFromCSToJS(filename, docstringStart, docstringEnd)
+  return foundSomething
+
+&lt;/CoffeeScript&gt; */
+<span id='jsduckify-method-duckifyFile'>/**
+</span> * @method duckifyFile
+ * @member jsduckify
+ * Once it's used, it's marked as such in the exportsAPI
+ * 
+ * @param {String} sourceFileString CoffeeScript source
+ * @param {Array} exportsAPI each row contains {baseName, fullName, type}
+ * @param {String} [prefix] the root for this documentation
+ * 
+ * @return {String} duckified source file
+ */
+/* &lt;CoffeeScript&gt;
+exports.duckifyFile = (filename, sourceFileString, exportsAPI, prefix = '', isMain = false) -&gt;
+  # !TODO: (round 2) Runs documentFile on it creating fileDocumentation. This runs the CoffeeScript compiler extracting classes
+  # and functions. It can distinguish static methods from instance methods within your classes. It can also identify
+  # functions not associated with a CoffeeScript class. However, it cannot identify any properties.
+#  fileDocumentation = documentFile(sourceFileString)
+
+  # Breaks the file down into lines.
+  sourceFileString = sourceFileString.replace(/\/\* /g,'/ *')  # This is a hack but good enough
+  sourceFileString = sourceFileString.replace(/\*\//g,'* /')
+
+  lineList = new DoublyLinkedList(sourceFileString.split('\n'))
+
+  # Turn the entire file into a big JavaScript block comment
+  lineList.unshift('/ * &lt;CoffeeScript&gt;')
+  lineList.push('&lt;/CoffeeScript&gt; * /')
+
+  # Walks through the file line-by-line looking for docstrings starting with ### and ending with ###.
+  foundSomething = false
+  current = lineList.head
+  currentClassDocstring = {}
+
+  while current?
+    if current.value.match(/(\n|\r|^)\s*###/)?
+      # !TODO: If a starting markers is not on its own line, make it so.
+      docstringStart = current
+      current = current.after
+      while current? and !current.value.match(/(\n|\r|^)\s*###/)?
+        current = current.after
+      unless current?
+        throw new Error(&quot;Found a docstring start without a corresponding docstring end in file: #{filename}&quot;)
+      docstringEnd = current
+      if isMain
+        _convertDocstringFromCSToJS(filename, docstringStart, docstringEnd)
+        foundSomething = true
+      else if _processDocstring(filename, docstringStart, docstringEnd, currentClassDocstring, exportsAPI, prefix)
+        foundSomething = true
+    current = current.after
+
+  if foundSomething
+    fileString = lineList.toArray().join('\n')
+  else
+    fileString = null
+  return fileString
+
+&lt;/CoffeeScript&gt; */</pre>
+</body>
+</html>

@@ -1,3 +1,6 @@
 .DS_Store
-bin/Lumenize_JSDuckDocs
+.idea
+bin/Lumenize_jsduckify_JSDuckDocs
+node_modules
 example output
+play

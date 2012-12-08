@@ -2,7 +2,8 @@ path = require('path')
 fs = require('fs')
 {spawn, exec} = require('child_process')
 
-{outputSources} = require('../')
+jsduckify = require('../')
+{duckifyFiles, documentExportsAPI, buildMainFile} = jsduckify
 
 _run = (command, options, next) ->
   if options? and options.length > 0
@@ -28,35 +29,34 @@ _rm = (target) ->
       fs.rmdirSync(target)
     else
       fs.unlinkSync(target)
-    
+
 # Command line options
 OPTIONS =
   '--help, -h                      ': 'Displays this help'
-  '--output, -o <output filename>  ': 'Output filename (default: <target1>.js if only one target; jsduckifyOutput.js otherwise)'
-  '--base, -b <base class>         ': 'Specifies the "base class" for static functions and classes'
-  '--docsoutput, -d <doc directory>': 'Specifies the directory where the Sencha jsduck output will go'
-  '--noduck, -n                    ': 'Tells jsduckify not to call jsduck when done duckifying'
+  '--prefix, -p <prefix>           ': 'Specifies the root to prefix all documentation (default: <module_name>)'
+  '--output, -o <output_directory> ': 'Output directory (default: <prefix>_jsduckify)'
+  '--docsoutput, -d <doc_directory>': 'JSDuck output directory (default: <module_name>_jsduckify_JSDuckDocs)'
+  '--noduck, -n                    ': 'Tells jsduckify not to call JSDuck when done duckifying'
+  '--readme, -r                    ': 'Tells jsduckify to use the README.md as the docs for the main file'
 
 help = () ->
-  ### Show help message and exit ###
+  #Show help message and exit
   console.log('''
-              Usage: 
-                  jsduckify [options] [target directory (default .)]
-                  jsduckify [options] [target1] [target2] (mix files and directories) ...
-                  
-              Note, when you use a single target directory, the README.md is treated as the docstring for any loose ("static")
-              functions.
-              
+              Usage:
+                  jsduckify [options] [module_directory (default .)]
+
               Options:
               ''')
   for flag, description of OPTIONS
-      console.log('    ' + flag + ': ' + description)
-  process.exit()
-  
+    console.log('    ' + flag + ': ' + description)
+  process.exit(1)
+
 opts = process.argv[2...process.argv.length]
 if opts.length == 0 then help()
 
 noduck = false
+searchNodeModules = false
+readme = false
 
 while opts[0]? and opts[0].substr(0, 1) == '-'
   o = opts.shift()
@@ -64,77 +64,147 @@ while opts[0]? and opts[0].substr(0, 1) == '-'
     when '-h', '--help'
       help()
     when '-o', '--output'
-      outputFileName = opts.shift()
-    when '-b', '--base'
-      prefix = opts.shift()
+      outputDirectory = opts.shift()
     when '-d', '--docoutput'
       docoutput = opts.shift()
+    when '-p', '--prefix'
+      prefix = opts.shift()
     when '-n', '--noduck'
-      noduck = true      
-      
-unless outputFileName?
-  if opts.length == 1
-    outputFileName = path.basename(path.resolve(opts[0]))
-  else
-    outputFileName = 'jsduckifyOutput'
-     
-unless prefix?
-  prefix = outputFileName
+      noduck = true
+    when '-r', '--readme'
+      readme = true
 
-unless path.extname(outputFileName) == '.js'
-  outputFileName += '.js'
-  
+if opts.length == 1
+  moduleDirectory = opts[0]
+  unless fs.statSync(moduleDirectory).isDirectory()
+    help()
+else if opts.length == 0
+  moduleDirectory = '.'
+else
+  console.error('No target directory specified.')
+  help()
+
+unless prefix?
+  prefix = path.basename(path.resolve(moduleDirectory))
+
+unless outputDirectory?
+  outputDirectory = prefix + '_jsduckify'
+
 unless docoutput?
-  resolvedOutputFileName = path.resolve(outputFileName)
-  docoutput = path.join(path.dirname(resolvedOutputFileName), path.basename(resolvedOutputFileName, '.js')) + '_JSDuckDocs'
+  resolvedoutputDirectory = path.resolve(outputDirectory)
+  docoutput = path.join(path.dirname(resolvedoutputDirectory), path.basename(resolvedoutputDirectory, '.js')) + '_JSDuckDocs'
 
 # Get source file paths
-_getSourceFiles = (target, a) ->
+_getsourceFiles = (target, a) ->
   if not a?
     a = []
   if path.extname(target) == '.coffee'
     a.push(target)
   else if fs.statSync(target).isDirectory()
-    _getSourceFiles(path.join(target, p), a) for p in fs.readdirSync(target)
+    if searchNodeModules or path.basename(target) != 'node_modules'
+      _getsourceFiles(path.join(target, p), a) for p in fs.readdirSync(target)
+  return a
 
-if opts.length < 1
-  opts = ['.']
-  
-sources = []    
-_getSourceFiles(o, sources) for o in opts
+sources = _getsourceFiles(moduleDirectory)
 
-sourceFileStrings = (fs.readFileSync(s, 'utf8') for s in sources)
+_removeBasePath = (filename, baseToRemove) ->
+  unless filename.indexOf(baseToRemove) == 0 or baseToRemove in ['', './', '.']
+    throw new Error("Filename #{filename} does not start with #{baseToRemove}")
+  return filename.slice(baseToRemove.length)
 
-if opts.length == 1 and fs.statSync(opts[0]).isDirectory()
-  fileNames = fs.readdirSync(opts[0])
+sourceFileMap = {}
+for s in sources
+  key = _removeBasePath(s, moduleDirectory)
+  sourceFileMap[key] = fs.readFileSync(s, 'utf8')
+
+exportsAPI = documentExportsAPI(moduleDirectory)
+
+# {key = fileName: value = string with .js file to be written to disk}
+duckifiedFileMap = duckifyFiles(sourceFileMap, prefix, exportsAPI)
+
+#for key, value of duckifiedFileMap
+#  console.log(key, value.length)
+
+# Get README.md
+if readme
+  fileNames = fs.readdirSync(moduleDirectory)
   for f in fileNames
     if f.toLowerCase() == 'readme.md'
-      readmePath = path.join(opts[0], f)
+      readmePath = path.join(moduleDirectory, f)
       break
-  console.log(readmePath)
   if readmePath?
     readmeString = fs.readFileSync(readmePath, 'utf8')
-    console.log(readmeString)
-
-moduleString = outputSources(sourceFileStrings, prefix, readmeString)
-
-if outputFileName?
-  fs.writeFileSync(outputFileName, moduleString, 'utf8')
 else
-  process.stdout.write(moduleString + '\n');
+  readmeString = ''
 
+mainSourceString = null
+if fs.existsSync(path.join(moduleDirectory, 'package.json'))
+  packageDotJSONString = fs.readFileSync(path.join(moduleDirectory, 'package.json'), 'utf8')
+  packageJSON = JSON.parse(packageDotJSONString)
+  if packageJSON.main?
+    mainFilename = path.join(moduleDirectory, packageJSON.main)
+    unless mainFilename.indexOf('.coffee') > 0
+      mainFilename += '.coffee'
+    if fs.existsSync(mainFilename)
+      mainSourceString = fs.readFileSync(mainFilename, 'utf8')
+    else
+      console.error("Could not find mainfile at #{mainFilename}.")
+  else
+    console.log("Found package.json but no 'main' key in it.")
+unless mainSourceString?
+  mainFilename = path.join(moduleDirectory, 'index.coffee')
+  if fs.existsSync(mainFilename)
+    mainSourceString = fs.readFileSync(mainFilename, 'utf8')
+  else
+    console.log("Couldn't find 'index.coffee'. Creating dummy index.coffee.")
+    mainFilename = path.join(moduleDirectory, 'index.coffee')
+    mainSourceString = """
+      # Spaceholder CoffeeScript
+    """
+
+mainFileString = buildMainFile(mainFilename, readmeString, mainSourceString, exportsAPI, prefix)
+
+duckifiedFileMap[path.basename(mainFilename) + '.js'] = mainFileString
+
+if outputDirectory?
+  _rm(outputDirectory)
+
+_createDirectoryTree = (directoryTreeArray, index) ->
+  currentDirectoryArray = directoryTreeArray.slice(0, index + 1)
+  currentDirectory = currentDirectoryArray.join(path.sep)
+  unless fs.existsSync(currentDirectory)
+    fs.mkdirSync(currentDirectory)
+  unless index >= directoryTreeArray.length - 1 or directoryTreeArray[index + 1] == ''
+    _createDirectoryTree(directoryTreeArray, index + 1)
+
+for fileName, fileContents of duckifiedFileMap
+  if fileContents?
+    fullFileName = path.join(outputDirectory, fileName)
+    directoryTreeArray = path.join(outputDirectory, path.dirname(fileName)).split(path.sep)
+    _createDirectoryTree(directoryTreeArray, 0)
+    fs.writeFileSync(fullFileName, fileContents, 'utf8')
+
+# Run jsduck
 unless noduck
   _rm(docoutput)
   options = []
-  options.push('--no-source')
   options.push('-o')
   options.push(docoutput)
-  options.push(outputFileName)
+  jsduckConfigFilename = path.join(moduleDirectory, 'jsduck-config.json')
+  jsduckCategoriesFilename = path.join(moduleDirectory, 'jsduck-categories.json')
+  if fs.existsSync(jsduckConfigFilename)
+    options.push("--config=#{jsduckConfigFilename}")
+  if fs.existsSync(jsduckCategoriesFilename)
+    options.push("--categories=#{jsduckCategoriesFilename}")
+
+  options.push(outputDirectory)
+
   _run('jsduck', options, (error, stdout, stderr) ->
     unless error?
-      _rm(outputFileName)
+      _rm(outputDirectory)
+    if error
+      console.log('*** Error from running JSDuck...\n' + error)
+    console.log('*** Stdout from running JSDuck...\n' + stdout)
+    console.log('*** Stderr from running JSDuck...\n' + stderr)
   )
-  
-
-
   

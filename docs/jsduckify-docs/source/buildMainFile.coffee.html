@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/* &lt;CoffeeScript&gt;
+{duckifyFile} = require('../')
+{DoublyLinkedList} = require('doubly-linked-list')
+
+&lt;/CoffeeScript&gt; */
+<span id='jsduckify-method-buildMainFile'>/**
+</span> * @method buildMainFile
+ * @member jsduckify
+ * 
+ * @param {String} filename
+ * @param {String} readmeString
+ * @param {String} mainSourceString CoffeeScript source
+ * @param {Array} exportsAPI each row contains {baseName, fullName, type}
+ * @param {String} prefix the root for this documentation
+ * 
+ * @return {String} duckifiedMainFile
+ */
+/* &lt;CoffeeScript&gt;
+exports.buildMainFile = (filename, readmeString, mainSourceString, exportsAPI, prefix) -&gt;
+
+  # Breaks the file down into lines.
+  lineList = new DoublyLinkedList(mainSourceString.split('\n'))
+
+  unless lineList.head.value.indexOf('###') == 0  # Starts with a DocString. Make it the Main.
+    lineList.head.insertBefore('###')
+    lineList.head.insertBefore('###')
+
+  lineList.head.insertAfter(readmeString)
+  lineList.head.insertAfter(&quot;@class #{prefix}&quot;)
+
+  sourceFileString = lineList.toArray().join('\n')
+
+#  sourceFileString = &quot;&quot;&quot;
+#    ###
+#    @class #{prefix}
+#    @extends
+#    #{readmeString}
+#    ###
+#    #{mainSourceString}
+#  &quot;&quot;&quot;
+
+  for e in exportsAPI
+    unless e.processed?
+      console.log(&quot;Couldn't find #{e.fullName} in source.&quot;)
+
+  duckifiedMainFile = duckifyFile(filename, sourceFileString, exportsAPI, prefix = '', true)
+  return duckifiedMainFile
+&lt;/CoffeeScript&gt; */</pre>
+</body>
+</html>

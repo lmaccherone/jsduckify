@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/* &lt;CoffeeScript&gt;
+_type = do -&gt;  # from http://arcturo.github.com/library/coffeescript/07_the_bad_parts.html
+  classToType = {}
+  for name in &quot;Boolean Number String Function Array Date RegExp Undefined Null&quot;.split(&quot; &quot;)
+    classToType[&quot;[object &quot; + name + &quot;]&quot;] = name.toLowerCase()
+
+  (obj) -&gt;
+    strType = Object::toString.call(obj)
+    classToType[strType] or &quot;object&quot;
+
+_getExportsAPI = (root, exportsAPI, currentPrefix = '') -&gt;
+  for key, value of root
+    if currentPrefix.length &gt; 0
+      fullName = currentPrefix + '.' + key
+    else
+      fullName = key
+    nameArray = fullName.split('.')
+    baseName = nameArray[nameArray.length - 1]
+    type = _type(value)
+    row = {fullName, baseName, type}
+    exportsAPI.push(row)
+
+    if type == 'object'
+      _getExportsAPI(value, exportsAPI, fullName)
+
+&lt;/CoffeeScript&gt; */
+<span id='jsduckify-method-documentExportsAPI'>/**
+</span> * @method documentExportsAPI
+ * @member jsduckify
+ * @param {String} moduleDirectory
+ * @return {Array} {baseName, fullName, type}
+ * 
+ * This function will `require` the CoffeeScript directory under the assumption that it's a package.
+ * That will reveal the published API (tree) of namespaces, classes, properties, functions, etc.
+ * This function crawls that tree extracting the namespace structure for the package's API. This is
+ * later used to make sure the jsduck documentation indicates the same namespace tree.
+ */
+/* &lt;CoffeeScript&gt;
+exports.documentExportsAPI = (moduleDirectory) -&gt;
+  exportsAPI = []
+  _getExportsAPI(require(moduleDirectory), exportsAPI)
+
+  return exportsAPI
+&lt;/CoffeeScript&gt; */</pre>
+</body>
+</html>
