@@ -1,4 +1,4 @@
-{duckifyFile} = require('../')
+duckifyFile = require('./duckifyFile').duckifyFile
 
 ###
 @method duckifyFiles

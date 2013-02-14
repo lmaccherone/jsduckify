@@ -1,3 +1,12 @@
 #!/usr/bin/env coffee
 
-require(__dirname + '/../src/jsduckify')
+fs = require('fs')
+path = require('path')
+
+executable = path.join(__dirname, '..', 'jsduckify', 'src', 'jsduckify.coffee')
+
+if fs.existsSync(executable)
+  require(executable)
+else
+  executable = path.join(__dirname, '..', 'src', 'jsduckify.coffee')
+  require(executable)

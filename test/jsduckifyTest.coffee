@@ -1,4 +1,7 @@
-{duckifyFiles, documentExportsAPI} = require('../')
+#{duckifyFiles, documentExportsAPI} = require('../')
+
+documentExportsAPI = require('../src/documentExportsAPI').documentExportsAPI
+duckifyFiles = require('../src/duckifyFiles').duckifyFiles
 
 trim = (val) ->
   return if String::trim? then val.trim() else val.replace(/^\s+|\s+$/g, "")

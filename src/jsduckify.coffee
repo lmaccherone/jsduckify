@@ -2,8 +2,12 @@ path = require('path')
 fs = require('fs')
 {spawn, exec} = require('child_process')
 
-jsduckify = require('../')
-{duckifyFiles, documentExportsAPI, buildMainFile} = jsduckify
+#jsduckify = require('../')
+#{duckifyFiles, documentExportsAPI, buildMainFile} = jsduckify
+
+documentExportsAPI = require('./documentExportsAPI').documentExportsAPI
+duckifyFiles = require('./duckifyFiles').duckifyFiles
+buildMainFile = require('./buildMainFile').buildMainFile
 
 _run = (command, options, next) ->
   if options? and options.length > 0
@@ -83,6 +87,8 @@ else if opts.length == 0
 else
   console.error('No target directory specified.')
   help()
+
+moduleDirectory = path.resolve(moduleDirectory)
 
 unless prefix?
   prefix = path.basename(path.resolve(moduleDirectory))
@@ -177,6 +183,8 @@ _createDirectoryTree = (directoryTreeArray, index) ->
   unless index >= directoryTreeArray.length - 1 or directoryTreeArray[index + 1] == ''
     _createDirectoryTree(directoryTreeArray, index + 1)
 
+process.chdir(moduleDirectory)
+
 for fileName, fileContents of duckifiedFileMap
   if fileContents?
     fullFileName = path.join(outputDirectory, fileName)
@@ -185,6 +193,7 @@ for fileName, fileContents of duckifiedFileMap
     fs.writeFileSync(fullFileName, fileContents, 'utf8')
 
 # Run jsduck
+
 unless noduck
   _rm(docoutput)
   options = []

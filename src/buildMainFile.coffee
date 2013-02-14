@@ -1,4 +1,4 @@
-{duckifyFile} = require('../')
+duckifyFile = require('./duckifyFile').duckifyFile
 {DoublyLinkedList} = require('doubly-linked-list')
 
 ###

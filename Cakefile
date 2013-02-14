@@ -40,7 +40,7 @@ runSync = (command, options, next) ->
 #)
 
 
-task('docs', 'Generate docs with CoffeeDoc and place in ./docs', () ->
+task('docs', 'Generate docs ./docs', () ->
   process.chdir(__dirname)
   # create README.html
   readmeDotCSSString = fs.readFileSync('read-me.css', 'utf8')
