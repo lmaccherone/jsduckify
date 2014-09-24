@@ -1,8 +1,7 @@
 fs = require('fs')
 path = require('path')
 {spawn, exec} = require('child_process')
-# execSync = require('exec-sync')
-runsync = require('runsync')
+runsync = require('runsync')  # polyfil for node.js 0.12 synchronous running functionality. Remove when upgrading to 0.12
 marked = require('marked')
 wrench = require('wrench')
 
@@ -24,7 +23,6 @@ runSync = (command, options, next) ->
   if options? and options.length > 0
     command += ' ' + options.join(' ')
 
-#  {stdout, stderr} = execSync(command, true)
   output = runsync.popen(command)
   stdout = output.stdout.toString()
   stderr = output.stderr.toString()
@@ -36,13 +34,6 @@ runSync = (command, options, next) ->
   else
     if stdout.length > 0
       console.log("Stdout exec'ing command '#{command}'...\n" + stdout)
-
-# coffeedoctest does not work for this module because the examples use ### which coffeedoctest can't handle
-#task('doctest', 'Runs doctests found in documentation', () ->
-#  process.chdir(__dirname)
-#  runSync('node_modules/coffeedoctest/bin/coffeedoctest', ['--readme', 'src', 'index.coffee'])
-#)
-
 
 task('docs', 'Generate docs ./docs', () ->
   process.chdir(__dirname)
@@ -140,59 +131,3 @@ task('test', 'Run the CoffeeScript test suite with nodeunit', () ->
       process.exit(1)
   )
 )
-
-#fs = require('fs')
-#path = require('path')
-#{spawn, exec} = require('child_process')
-#execSync = require('exec-sync')
-#
-#
-#run = (command, options, next) ->
-#  if options? and options.length > 0
-#    command += ' ' + options.join(' ')
-#  exec(command, (error, stdout, stderr) ->
-#    if stderr.length > 0 and error?
-#      console.log("Stderr exec'ing command '#{command}'...\n" + stderr)
-#      console.log('exec error: ' + error)
-#    if next?
-#      next(stdout)
-#    else
-#      if stdout.length > 0 and stdout?
-#        console.log("Stdout exec'ing command '#{command}'...\n" + stdout)
-#  )
-#
-#task('compile', 'Compile CoffeeScript source files to JavaScript', () ->
-#  process.chdir(__dirname)
-#  fs.readdir('./', (err, contents) ->
-#    files = ("#{file}" for file in contents when (file.indexOf('.coffee') > 0))
-#    run('coffee', ['-c'].concat(files))
-#  )
-#)
-#
-#task('doctest', 'Runs doctests found in documentation', () ->
-#  process.chdir(__dirname)
-#  fs.readdir('./', (err, contents) ->
-#    files = ("#{file}" for file in contents when (file.indexOf('.coffee') > 0))
-#    run('node_modules/coffeedoctest/bin/coffeedoctest', ['--readme'].concat(files))
-#  )
-#)
-#
-#task('publish', 'Publish to npm', () ->
-#  process.chdir(__dirname)
-#  run('npm publish .')
-#)
-#
-#task('test', 'Run the CoffeeScript test suite with nodeunit', () ->
-#  {reporters} = require('nodeunit')
-#  process.chdir(__dirname)
-#  reporters.default.run(['test'], undefined, (failure) ->
-#    if failure?
-#      console.log(failure)
-#      process.exit(1)
-#  )
-#)
-#
-#task('testall', 'Runs both tests and doctests', () ->
-#  invoke('test')
-#  invoke('doctest')
-#)

@@ -100,6 +100,7 @@ The above command installs jsduckify into your current node_modules and adds it 
 
 ## Changelog ##
 
+* 0.3.0 - 2014-09-23 - Updated dependencies
 * 0.2.2 - 2013-02-14 - Made output of intermediate files go to local directory. Previously it went who knows where
 * 0.2.1 - ??? - ???
 * 0.2.0 - 2012-12-06 - Major refactor
