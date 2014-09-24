@@ -79,30 +79,18 @@
 </style>
 <body>
 <div class="readme">
-<p><a href="http://travis-ci.org/lmaccherone/jsduckify"><img src="https://secure.travis-ci.org/lmaccherone/jsduckify.png" alt="build status"></a>
-
-</p>
-<h1>jsduckify</h1>
-<p>Copyright (c) 2012, Lawrence S. Maccherone, Jr.
-
-</p>
-<p><em>Enables the use of Sencha&#39;s JSDuck for documenting CoffeeScript projects.</em>
-
-</p>
-<h2>Overview</h2>
+<p><a href="http://travis-ci.org/lmaccherone/jsduckify"><img src="https://secure.travis-ci.org/lmaccherone/jsduckify.png" alt="build status"></a></p>
+<h1 id="jsduckify">jsduckify</h1>
+<p>Copyright (c) 2012, Lawrence S. Maccherone, Jr.</p>
+<p><em>Enables the use of Sencha&#39;s JSDuck for documenting CoffeeScript projects.</em></p>
+<h2 id="overview">Overview</h2>
 <p>You can then run jsduck on <strong>jsduckify</strong>&#39;s output to generate beautiful documentation
-for your CoffeeScript project.
-
-</p>
+for your CoffeeScript project.</p>
 <p>Your CoffeeScript source is also included in the output wrapped in javascript block comments
 (<code>/*</code>…<code>*/</code>) which allows users of the documentation to see your CoffeeScript when the user
-of the resulting documentation clicks on &quot;view source&quot;.
-
-</p>
-<p><a href="http://lmaccherone.github.com/jsduckify/docs/jsduckify-docs/index.html">Here</a> is what running jsduckify looks like when run against itself.
-
-</p>
-<h3>Features</h3>
+of the resulting documentation clicks on &quot;view source&quot;.</p>
+<p><a href="http://lmaccherone.github.com/jsduckify/docs/jsduckify-docs/index.html">Here</a> is what running jsduckify looks like when run against itself.</p>
+<h3 id="features">Features</h3>
 <ul>
 <li>Is simply a one-to-one translation of the docstrings found in your CoffeeScript so you have almost complete control
 over the output. If you can do it in JSDuck, you can probably do it here.</li>
@@ -116,11 +104,11 @@ missing methods (round 2). Note, version 0.1.0 of <strong>jsduckify</strong> use
 from <a href="https://github.com/omarkhan/coffeedoc">Omar Khan&#39;s coffedoc</a> which took this approach
 using the CoffeeScript compiler.</li>
 </ul>
-<h2>Credits</h2>
+<h2 id="credits">Credits</h2>
 <ul>
 <li>Author: <a href="http://maccherone.com">Larry Maccherone</a></li>
 </ul>
-<h2>Usage</h2>
+<h2 id="usage">Usage</h2>
 <pre><code>Usage:
     jsduckify [options] [module_directory (default .)]
 
@@ -131,14 +119,10 @@ Options:
     --docsoutput, -d &lt;doc_directory&gt;: JSDuck output directory (default: &lt;module_name&gt;_jsduckify_JSDuckDocs)
     --noduck, -n                    : Tells jsduckify not to call JSDuck when done duckifying
     --readme, -r                    : Tells jsduckify to use the README.md as the docs for the main file</code></pre>
-<h3>Programatic Usage</h3>
-<p>Let&#39;s require it
-
-</p>
+<h3 id="programatic-usage">Programatic Usage</h3>
+<p>Let&#39;s require it</p>
 <pre><code>{duckifyFiles, documentExportsAPI} = require(&#39;./&#39;)</code></pre>
-<p>Let&#39;s give it a very simple bit of CoffeeScript source code containing a properly formatted block comment header.
-
-</p>
+<p>Let&#39;s give it a very simple bit of CoffeeScript source code containing a properly formatted block comment header.</p>
 <pre><code>source = &quot;&quot;&quot;
    callSomething(anything)
 
@@ -148,9 +132,7 @@ Options:
    ###
    class MyClass
 &quot;&quot;&quot;</code></pre>
-<p>Let&#39;s call it and output the results.
-
-</p>
+<p>Let&#39;s call it and output the results.</p>
 <pre><code>exportsAPI = documentExportsAPI(&#39;./&#39;)
 
 sourceFileMap = {&#39;MyClass.coffee&#39;: source}
@@ -172,14 +154,10 @@ for filename, outputSource of duckifiedFileMap
 # /* &lt;CoffeeScript&gt;
 # class MyClass
 # &lt;/CoffeeScript&gt; */</code></pre>
-<h2>Installation</h2>
-<p><code>npm install jsduckify --save-dev</code>
-
-</p>
-<p>The above command installs jsduckify into your current node_modules and adds it to the devDependencies section of your package.json
-
-</p>
-<h2>Changelog</h2>
+<h2 id="installation">Installation</h2>
+<p><code>npm install jsduckify --save-dev</code></p>
+<p>The above command installs jsduckify into your current node_modules and adds it to the devDependencies section of your package.json</p>
+<h2 id="changelog">Changelog</h2>
 <ul>
 <li>0.2.2 - 2013-02-14 - Made output of intermediate files go to local directory. Previously it went who knows where</li>
 <li>0.2.1 - ??? - ???</li>
@@ -195,21 +173,15 @@ that you&#39;ve covered all of the API</li>
 </li>
 <li>0.1.0 - 2012-11-03 - Original version</li>
 </ul>
-<h2>MIT License</h2>
-<p>Copyright (c) 2012, Lawrence S. Maccherone, Jr.
-
-</p>
+<h2 id="mit-license">MIT License</h2>
+<p>Copyright (c) 2012, Lawrence S. Maccherone, Jr.</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the &quot;Software&quot;), to deal in the Software without
 restriction, including without limitation the rights to use, copy, modify, merge, publish,
 distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following conditions:
-
-</p>
+Software is furnished to do so, subject to the following conditions:</p>
 <p>The above copyright notice and this permission notice shall be included in all copies or
-substantial portions of the Software.
-
-</p>
+substantial portions of the Software.</p>
 <p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
 BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,

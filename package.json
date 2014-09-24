@@ -14,7 +14,7 @@
   },
   "homepage": "https://github.com/lmaccherone/jsduckify",
   "engines": {
-    "node": "0.8.x"
+    "node": "0.10.x"
   },
   "repository": {
     "type": "git",
@@ -25,14 +25,14 @@
     "jsduckify": "./bin/jsduckify"
   },
   "dependencies": {
-    "coffee-script": "1.4.x",
     "doubly-linked-list": "~0.1.4"
   },
   "devDependencies": {
-    "nodeunit": "0.7.x",
+    "coffee-script": "^1.8.0",
     "coffeedoctest": "0.4.x",
     "exec-sync": "~0.1.5",
     "marked": "~0.2.6",
+    "nodeunit": "0.7.x",
     "wrench": "~1.4.4"
   },
   "scripts": {

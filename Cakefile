@@ -2,6 +2,7 @@ fs = require('fs')
 path = require('path')
 {spawn, exec} = require('child_process')
 execSync = require('exec-sync')
+runsync = require('runsync')
 marked = require('marked')
 wrench = require('wrench')
 
@@ -23,7 +24,10 @@ runSync = (command, options, next) ->
   if options? and options.length > 0
     command += ' ' + options.join(' ')
 
-  {stdout, stderr} = execSync(command, true)
+#  {stdout, stderr} = execSync(command, true)
+  output = runsync.popen(command)
+  stdout = output.stdout.toString()
+  stderr = output.stderr.toString()
   if stderr.length > 0
     console.error("Error running `#{command}`\n" + stderr)
     process.exit(1)
@@ -63,7 +67,7 @@ task('docs', 'Generate docs ./docs', () ->
   outputDirectory = path.join(__dirname, 'docs', "#{name}-docs")
   if fs.existsSync(outputDirectory)
     wrench.rmdirSyncRecursive(outputDirectory, false)
-  runSync('bin/jsduckify', ['-d', outputDirectory, __dirname])
+  runSync('bin/jsduckify', ['-d', "'" + outputDirectory + "'", "'" + __dirname + "'"])
 )
 
 task('pub-docs', 'Push master to gh-pages on github', () ->

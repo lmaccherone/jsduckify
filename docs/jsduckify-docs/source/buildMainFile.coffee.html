@@ -16,8 +16,8 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/* &lt;CoffeeScript&gt;
-duckifyFile = require('./duckifyFile').duckifyFile
-{DoublyLinkedList} = require('doubly-linked-list')
+duckifyFile = require(&#39;./duckifyFile&#39;).duckifyFile
+{DoublyLinkedList} = require(&#39;doubly-linked-list&#39;)
 
 &lt;/CoffeeScript&gt; */
 <span id='jsduckify-method-buildMainFile'>/**
@@ -36,16 +36,16 @@ duckifyFile = require('./duckifyFile').duckifyFile
 exports.buildMainFile = (filename, readmeString, mainSourceString, exportsAPI, prefix) -&gt;
 
   # Breaks the file down into lines.
-  lineList = new DoublyLinkedList(mainSourceString.split('\n'))
+  lineList = new DoublyLinkedList(mainSourceString.split(&#39;\n&#39;))
 
-  unless lineList.head.value.indexOf('###') == 0  # Starts with a DocString. Make it the Main.
-    lineList.head.insertBefore('###')
-    lineList.head.insertBefore('###')
+  unless lineList.head.value.indexOf(&#39;###&#39;) == 0  # Starts with a DocString. Make it the Main.
+    lineList.head.insertBefore(&#39;###&#39;)
+    lineList.head.insertBefore(&#39;###&#39;)
 
   lineList.head.insertAfter(readmeString)
   lineList.head.insertAfter(&quot;@class #{prefix}&quot;)
 
-  sourceFileString = lineList.toArray().join('\n')
+  sourceFileString = lineList.toArray().join(&#39;\n&#39;)
 
 #  sourceFileString = &quot;&quot;&quot;
 #    ###
@@ -58,9 +58,9 @@ exports.buildMainFile = (filename, readmeString, mainSourceString, exportsAPI, p
 
   for e in exportsAPI
     unless e.processed?
-      console.log(&quot;Couldn't find #{e.fullName} in source.&quot;)
+      console.log(&quot;Couldn&#39;t find #{e.fullName} in source.&quot;)
 
-  duckifiedMainFile = duckifyFile(filename, sourceFileString, exportsAPI, prefix = '', true)
+  duckifiedMainFile = duckifyFile(filename, sourceFileString, exportsAPI, prefix = &#39;&#39;, true)
   return duckifiedMainFile
 &lt;/CoffeeScript&gt; */</pre>
 </body>

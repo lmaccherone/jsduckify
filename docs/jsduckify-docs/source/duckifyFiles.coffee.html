@@ -16,7 +16,7 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/* &lt;CoffeeScript&gt;
-duckifyFile = require('./duckifyFile').duckifyFile
+duckifyFile = require(&#39;./duckifyFile&#39;).duckifyFile
 
 &lt;/CoffeeScript&gt; */
 <span id='jsduckify-method-duckifyFiles'>/**
@@ -36,7 +36,7 @@ exports.duckifyFiles = (sourceFileMap, prefix, exportsAPIMap) -&gt;
   for filename, sourceFileString of sourceFileMap
     duckifiedFile = duckifyFile(filename, sourceFileString, exportsAPIMap, prefix)
     if duckifiedFile?
-      duckifiedFileMap[filename + '.js'] = duckifiedFile
+      duckifiedFileMap[filename + &#39;.js&#39;] = duckifiedFile
 
   return duckifiedFileMap
 &lt;/CoffeeScript&gt; */</pre>

@@ -25,19 +25,19 @@ _type = do -&gt;  # from http://arcturo.github.com/library/coffeescript/07_the_b
     strType = Object::toString.call(obj)
     classToType[strType] or &quot;object&quot;
 
-_getExportsAPI = (root, exportsAPI, currentPrefix = '') -&gt;
+_getExportsAPI = (root, exportsAPI, currentPrefix = &#39;&#39;) -&gt;
   for key, value of root
     if currentPrefix.length &gt; 0
-      fullName = currentPrefix + '.' + key
+      fullName = currentPrefix + &#39;.&#39; + key
     else
       fullName = key
-    nameArray = fullName.split('.')
+    nameArray = fullName.split(&#39;.&#39;)
     baseName = nameArray[nameArray.length - 1]
     type = _type(value)
     row = {fullName, baseName, type}
     exportsAPI.push(row)
 
-    if type == 'object'
+    if type == &#39;object&#39;
       _getExportsAPI(value, exportsAPI, fullName)
 
 &lt;/CoffeeScript&gt; */
@@ -47,9 +47,9 @@ _getExportsAPI = (root, exportsAPI, currentPrefix = '') -&gt;
  * @param {String} moduleDirectory
  * @return {Array} {baseName, fullName, type}
  * 
- * This function will `require` the CoffeeScript directory under the assumption that it's a package.
+ * This function will `require` the CoffeeScript directory under the assumption that it&#39;s a package.
  * That will reveal the published API (tree) of namespaces, classes, properties, functions, etc.
- * This function crawls that tree extracting the namespace structure for the package's API. This is
+ * This function crawls that tree extracting the namespace structure for the package&#39;s API. This is
  * later used to make sure the jsduck documentation indicates the same namespace tree.
  */
 /* &lt;CoffeeScript&gt;

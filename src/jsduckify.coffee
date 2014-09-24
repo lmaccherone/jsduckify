@@ -198,15 +198,15 @@ unless noduck
   _rm(docoutput)
   options = []
   options.push('-o')
-  options.push(docoutput)
+  options.push("'" + docoutput + "'")
   jsduckConfigFilename = path.join(moduleDirectory, 'jsduck-config.json')
   jsduckCategoriesFilename = path.join(moduleDirectory, 'jsduck-categories.json')
   if fs.existsSync(jsduckConfigFilename)
-    options.push("--config=#{jsduckConfigFilename}")
+    options.push("--config='#{jsduckConfigFilename}'")
   if fs.existsSync(jsduckCategoriesFilename)
-    options.push("--categories=#{jsduckCategoriesFilename}")
+    options.push("--categories='#{jsduckCategoriesFilename}'")
 
-  options.push(outputDirectory)
+  options.push("'" + outputDirectory + "'")
 
   _run('jsduck', options, (error, stdout, stderr) ->
     unless error?
