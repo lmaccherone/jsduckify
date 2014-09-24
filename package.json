@@ -30,7 +30,7 @@
   "devDependencies": {
     "coffee-script": "^1.8.0",
     "coffeedoctest": "0.4.x",
-    "exec-sync": "~0.1.5",
+    "runsync": "~0.1.6",
     "marked": "~0.2.6",
     "nodeunit": "0.7.x",
     "wrench": "~1.4.4"

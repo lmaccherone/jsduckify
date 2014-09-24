@@ -1,7 +1,7 @@
 fs = require('fs')
 path = require('path')
 {spawn, exec} = require('child_process')
-execSync = require('exec-sync')
+# execSync = require('exec-sync')
 runsync = require('runsync')
 marked = require('marked')
 wrench = require('wrench')
