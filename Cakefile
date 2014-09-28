@@ -75,13 +75,19 @@ task('publish', 'Publish to npm and add git tags', () ->
   invoke('docs')
   runSync('git status --porcelain', [], (stdout) ->
     if stdout.length == 0
-      {stdout, stderr} = execSync('git rev-parse origin/master', true)
+      output = runsync.popen('git rev-parse origin/master')
+      stdout = output.stdout.toString()
+      stderr = output.stderr.toString()
       stdoutOrigin = stdout
-      {stdout, stderr} = execSync('git rev-parse master', true)
+      output = runsync('git rev-parse master')
+      stdout = output.stdout.toString()
+      stderr = output.stderr.toString()
       stdoutMaster = stdout
       if stdoutOrigin == stdoutMaster
         console.log('running npm publish')
-        {stdout, stderr} = execSync('npm publish .', true)
+        output = runsync('npm publish .')
+        stdout = output.stdout.toString()
+        stderr = output.stderr.toString()
         if fs.existsSync('npm-debug.log')
           console.error('`npm publish` failed. See npm-debug.log for details.')
         else
