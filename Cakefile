@@ -61,7 +61,7 @@ task('docs', 'Generate docs ./docs', () ->
   runSync('bin/jsduckify', ['-d', "'" + outputDirectory + "'", "'" + __dirname + "'"])
 )
 
-task('pub-docs', 'Push master to gh-pages on github', () ->
+task('pub-docs', 'Push docs to gh-pages on github', () ->
   pubDocsRaw()
 )
 
@@ -69,7 +69,7 @@ pubDocsRaw = () ->
   process.chdir(__dirname)
   runAsync('git push -f origin master:gh-pages')
 
-task('publish', 'Publish to npm', () ->
+task('publish', 'Publish to npm and add git tags', () ->
   process.chdir(__dirname)
   runSync('cake test')  # Doing this exernally to make it synchrous
   invoke('docs')
@@ -87,31 +87,6 @@ task('publish', 'Publish to npm', () ->
         else
           console.log('running pubDocsRaw()')
           pubDocsRaw()
-          console.log('running git tag')
-          runSync("git tag v#{require('./package.json').version}")
-          runAsync("git push --tags")
-      else
-        console.error('Origin and master out of sync. Not publishing.')
-    else
-      console.error('`git status --porcelain` was not clean. Not publishing.')
-  )
-)
-
-task('publish', 'Publish to npm', () ->
-  process.chdir(__dirname)
-  runSync('cake test')  # Doing this exernally to make it synchrous
-  runSync('git status --porcelain', [], (stdout) ->
-    if stdout.length == 0
-      {stdout, stderr} = execSync('git rev-parse origin/master', true)
-      stdoutOrigin = stdout
-      {stdout, stderr} = execSync('git rev-parse master', true)
-      stdoutMaster = stdout
-      if stdoutOrigin == stdoutMaster
-        console.log('running npm publish')
-        {stdout, stderr} = execSync('npm publish .', true)
-        if fs.existsSync('npm-debug.log')
-          console.error('`npm publish` failed. See npm-debug.log for details.')
-        else
           console.log('running git tag')
           runSync("git tag v#{require('./package.json').version}")
           runAsync("git push --tags")
