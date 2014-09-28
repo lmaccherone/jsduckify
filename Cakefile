@@ -79,13 +79,13 @@ task('publish', 'Publish to npm and add git tags', () ->
       stdout = output.stdout.toString()
       stderr = output.stderr.toString()
       stdoutOrigin = stdout
-      output = runsync('git rev-parse master')
+      output = runsync.popen('git rev-parse master')
       stdout = output.stdout.toString()
       stderr = output.stderr.toString()
       stdoutMaster = stdout
       if stdoutOrigin == stdoutMaster
         console.log('running npm publish')
-        output = runsync('npm publish .')
+        output = runsync.popen('npm publish .')
         stdout = output.stdout.toString()
         stderr = output.stderr.toString()
         if fs.existsSync('npm-debug.log')
