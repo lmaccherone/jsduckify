@@ -151,16 +151,21 @@ mainSourceString = null
 if fs.existsSync(path.join(moduleDirectory, 'package.json'))
   packageDotJSONString = fs.readFileSync(path.join(moduleDirectory, 'package.json'), 'utf8')
   packageJSON = JSON.parse(packageDotJSONString)
-  if packageJSON.main? and not mainFilename?
+  if mainFilename?
+    mainFilename = path.join(moduleDirectory, mainFilename)
+  else if packageJSON.main?
     mainFilename = path.join(moduleDirectory, packageJSON.main)
-    unless mainFilename.indexOf('.coffee') > 0
-      mainFilename += '.coffee'
-    if fs.existsSync(mainFilename)
-      mainSourceString = fs.readFileSync(mainFilename, 'utf8')
-    else
-      console.error("Could not find mainfile at #{mainFilename}.")
   else
-    console.log("Found package.json but no 'main' key in it.")
+    console.log("Found package.json but no 'main' key in it. Please, specify main key in package.json or pass -m file")
+
+  unless mainFilename.indexOf('.coffee') > 0
+      mainFilename += '.coffee'
+
+  if fs.existsSync(mainFilename)
+    mainSourceString = fs.readFileSync(mainFilename, 'utf8')
+  else
+    console.error("Could not find mainfile at #{mainFilename}.")
+
 unless mainSourceString?
   mainFilename = path.join(moduleDirectory, 'index.coffee')
   if fs.existsSync(mainFilename)
