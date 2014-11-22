@@ -37,6 +37,7 @@ _rm = (target) ->
 # Command line options
 OPTIONS =
   '--help, -h                      ': 'Displays this help'
+  '--main, -m                      ': 'Specifies the main file'
   '--prefix, -p <prefix>           ': 'Specifies the root to prefix all documentation (default: <module_name>)'
   '--output, -o <output_directory> ': 'Output directory (default: <prefix>_jsduckify)'
   '--docsoutput, -d <doc_directory>': 'JSDuck output directory (default: <module_name>_jsduckify_JSDuckDocs)'
@@ -61,6 +62,7 @@ if opts.length == 0 then help()
 noduck = false
 searchNodeModules = false
 readme = false
+mainFilename = null
 
 while opts[0]? and opts[0].substr(0, 1) == '-'
   o = opts.shift()
@@ -72,11 +74,13 @@ while opts[0]? and opts[0].substr(0, 1) == '-'
     when '-d', '--docoutput'
       docoutput = opts.shift()
     when '-p', '--prefix'
-      prefix = opts.shift()
+      prefix = mainFilename
     when '-n', '--noduck'
       noduck = true
     when '-r', '--readme'
       readme = true
+    when '-m', '--main'
+      mainFilename = opts.shift()
 
 if opts.length == 1
   moduleDirectory = opts[0]
@@ -147,7 +151,7 @@ mainSourceString = null
 if fs.existsSync(path.join(moduleDirectory, 'package.json'))
   packageDotJSONString = fs.readFileSync(path.join(moduleDirectory, 'package.json'), 'utf8')
   packageJSON = JSON.parse(packageDotJSONString)
-  if packageJSON.main?
+  if packageJSON.main? and not mainFilename?
     mainFilename = path.join(moduleDirectory, packageJSON.main)
     unless mainFilename.indexOf('.coffee') > 0
       mainFilename += '.coffee'
