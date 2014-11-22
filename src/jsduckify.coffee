@@ -127,7 +127,10 @@ for s in sources
   key = _removeBasePath(s, moduleDirectory)
   sourceFileMap[key] = fs.readFileSync(s, 'utf8')
 
-exportsAPI = documentExportsAPI(moduleDirectory)
+if mainFilename?
+  exportsAPI = documentExportsAPI(path.join(moduleDirectory, mainFilename))
+else
+  exportsAPI = documentExportsAPI(moduleDirectory)
 
 # {key = fileName: value = string with .js file to be written to disk}
 duckifiedFileMap = duckifyFiles(sourceFileMap, prefix, exportsAPI)
